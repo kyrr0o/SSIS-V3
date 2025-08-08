@@ -1,0 +1,158 @@
+{% extends "master_layout.html" %} {% block content %}
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center">
+    {% if search %}
+    <button
+      id="gobackstudent"
+      name="gobackstudent"
+      type="button"
+      class="btn btn-outline-dark"
+    >
+      Go Back
+    </button>
+    {% endif %} {% if not hideAdd %}
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addStudent"
+    >
+      Add Student
+    </button>
+    {% endif %}
+    <form
+      action="{{ url_for('student_bp.student_search') }}"
+      style="width: 50%"
+    >
+      <div class="form-floating">
+        <select
+          class="form-select"
+          style="width: 50%"
+          aria-label="Default select example"
+          id="filter_student"
+          name="filter_student"
+        >
+          <option selected value="0">All</option>
+          <option value="1">Student ID</option>
+          <option value="2">FirstName</option>
+          <option value="3">LastName</option>
+          <option value="4">Student Course</option>
+          <option value="5">Year</option>
+          <option value="6">Gender</option>
+        </select>
+        <label for="filter_student" class="text-secondary-emphasis fw-bold"
+          >Search By</label
+        >
+      </div>
+      <div class="form-floating">
+        <div class="form-floating">
+          <input
+            name="querystudent"
+            class="form-control"
+            id="searchBar"
+            placeholder="Search"
+          />
+          <label for="searchBar">Search</label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% include 'student_add.html'%} {% if students %}
+  <h2>Student List</h2>
+  <table class="table table-light table-hover p-5">
+    <thead>
+      <tr>
+        <th scope="col">Student ID</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Course Code</th>
+        <th scope="col">College</th>
+        <th scope="col">Year</th>
+        <th scope="col">Gender</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    {% for student in students %}
+    <tbody>
+      <tr>
+        <th scope="row">
+          <img src="{{ student.picture if student.picture is not none else url_for('static', filename='picture.png') }}" class="img rounded-pill" id="photo-preview" style="width: 50px; height: 50px; object-fit: cover; object-position: center;"> <p>{{student.id}}</p>
+        </th>
+        <th scope="row">{{student.firstname}}</th>
+        <th scope="row">{{student.lastname}}</th>
+        <th scope="row">{{student.course_code}}</th>
+        <th scope="row">{{student.college}}</th>
+        <th scope="row">{{student.year}}</th>
+        <th scope="row">{{student.gender}}</th>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-secondary edit-Student"
+            data-bs-toggle="modal"
+            data-bs-target="#editStudent"
+            data-student-id="{{student.id}}"
+            data-student-firstname="{{student.firstname}}"
+            data-student-lastname="{{student.lastname}}"
+            data-student-course="{{student.course_code}}"
+            data-student-year="{{student.year}}"
+            data-student-gender="{{student.gender}}"
+            data-student-picture="{{student.picture}}"
+          >
+            Edit Student
+          </button>
+        </td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-danger delete-Student"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteStudent"
+            data-student-id="{{student.id}}"
+          >
+            Delete Student
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    {% include 'student_delete.html'%} {% include 'student_edit.html'%} {%
+    endfor %}
+  </table>
+  {% elif studentInput %}
+  <div class="d-flex justify-content-between flex-column align-items-center">
+    <div class="alert alert-danger" role="alert">
+      Theres no {{filter_message}} Like: {{studentInput}}
+    </div>
+  </div>
+  {% else %}
+  <div class="d-flex justify-content-center">
+    <h1>Theres no Students yet</h1>
+  </div>
+
+  {% endif %}
+</div>
+
+<style>
+
+  .loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+
+<script>
+  const urlimg = "{{ url_for('static', filename='picture.png') }}";
+</script>
+<script src="{{ url_for('static', filename='student.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,184 @@
+<div
+  class="modal fade"
+  id="addStudent"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="addStudentLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addStudentLabel">Add Student</h1>
+      </div>
+      <div class="modal-body">
+        <div
+            class="alert alert-danger"
+            id="erroraddstdmsg"
+            name="erroraddstdmsg"
+            role="alert"
+            style="display: none"
+          ></div>
+        <form id="addStudentForm" autocomplete="off" enctype="multipart/form-data">
+          <div class="mb-3 d-flex flex-column justify-content-center text-center">
+            <img src="{{ url_for('static', filename='picture.png') }}" class="img rounded-pill align-self-center" id="photo-preview" style="width: 100px; height: 100px; object-fit: cover; object-position: center;"> 
+            <input class="form-control rounded" type="file" id="formFile" name="formFile" style="display: none;" accept="image/*">
+            <label id="uploadBtn" for="formFile" style="cursor: pointer ; box-shadow: rgb(175, 175, 30);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera" viewBox="0 0 16 16">
+              <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+              <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+            </svg></label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="student_id"
+              name="student_id"
+              placeholder="Course Code"
+              required
+              value="{{ request.form['code'] }}"
+              maxlength="20"
+            />
+            <label for="student_id" class="text-secondary-emphasis fw-bold"
+              >Student Id</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="student_first_name"
+              name="student_first_name"
+              placeholder="Course name"
+              autocomplete="off"
+              required
+              value="{{ request.form.get('student_first_name', '') }}"
+            />
+            <label
+              for="student_first_name"
+              class="text-secondary-emphasis fw-bold"
+              >Student First Name</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="student_last_name"
+              name="student_last_name"
+              placeholder="Course name"
+              autocomplete="off"
+              required
+              value="{{ request.form.get('student_first_name', '') }}"
+            />
+            <label
+              for="student_last_name"
+              class="text-secondary-emphasis fw-bold"
+              >Student Last Name</label
+            >
+          </div>
+          
+          <div class="form-floating mb-3">
+            <select
+              class="form-select"
+              id="student_course_code"
+              name="student_course_code"
+              aria-label="Floating label select example"
+              required
+            >
+              <option value="" selected disabled>Select</option>
+              {% for course in courses%}
+              <option value="{{course.code}}">{{course.code}}</option>
+              {% endfor %}
+            </select>
+            <label
+              for="student_course_code"
+              class="text-secondary-emphasis fw-bold"
+              >What Course</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="student_year"
+              name="student_year"
+              placeholder="Course name"
+              autocomplete="off"
+              required
+              value="{{ request.form.get('student_first_name', '') }}"
+            />
+            <label for="student_year" class="text-secondary-emphasis fw-bold"
+              >Student Year</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <select
+              class="form-select"
+              id="student_gender"
+              name="student_gender"
+              aria-label="Floating label select example"
+              required
+            >
+              <option value="" selected disabled>Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <label for="student_gender" class="text-secondary-emphasis fw-bold"
+              >Gender</label
+            >
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark fs-5"
+          data-bs-target="#addStudent"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          form="addStudentForm"
+          class="btn btn-outline-primary fs-5"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("addStudentForm").addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent normal form submit
+
+  let form = document.getElementById("addStudentForm");
+  let formData = new FormData(form);
+
+  fetch("/student/add", {
+  method: "POST",
+  body: formData,
+})
+.then((response) => response.json())
+.then((data) => {
+  console.log("✅ Server Response:", data);
+
+  if (data.message === "Student added successfully") {
+    alert("🎉 Student added!");
+    document.getElementById("studentForm").reset();
+    document.getElementById("previewImage").src = "/static/picture.png"; // or any default
+    closeModal(); // if you're using a modal
+  } else if (data.error) {
+    alert("❌ Error: " + data.error);
+  }
+})
+.catch((error) => {
+  console.error("❌ Error submitting form:", error);
+});
+});
+</script>
