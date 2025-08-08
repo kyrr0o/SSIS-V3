@@ -54,9 +54,7 @@ def student_add():
     print("Gender:", request.form.get("student_gender"))
     print("✅ Student added successfully")
 
-
-
-    id = request.form.get('student_id')
+    id = request.form.get('student_id', '').strip()
     firstname = request.form.get('student_first_name')
     lastname = request.form.get('student_last_name')
     course_code = request.form.get('student_course_code')
@@ -69,8 +67,6 @@ def student_add():
     picture = request.files['formFile']
     print("📂 Picture object:", picture)
     print("📂 Picture filename:", picture.filename)
-
-
 
     # Check if student ID is already taken
     exist_student = Student.check_existing_id(id)
@@ -113,7 +109,9 @@ def student_delete():
         student = Student.get_one(id)
         if student.picture:
             public_id = get_public_id_from_url(student.picture)
-            result = uploader.destroy(public_id)
+            if public_id:
+                uploader.destroy(public_id)
+
         student.delete()
         return redirect(url_for("student_bp.student"))
     except Exception as e:
@@ -150,7 +148,9 @@ def student_edit():
                 if picture and allowed_file(picture.filename):
                     if student.picture:
                         public_id = get_public_id_from_url(student.picture)
-                        result = uploader.destroy(public_id)
+                        if public_id:
+                            uploader.destroy(public_id)
+
                     result1 = upload(picture, folder= Config.CLOUDINARY_FOLDER)
                     student.picture = result1['secure_url']
                 elif not picture and not student.picture :
@@ -171,7 +171,9 @@ def student_edit():
             if picture and allowed_file(picture.filename):
                 if student.picture:
                     public_id = get_public_id_from_url(student.picture)
-                    result = uploader.destroy(public_id)
+                    if public_id:
+                        uploader.destroy(public_id)
+
                 result1 = upload(picture, folder= Config.CLOUDINARY_FOLDER)
                 student.picture = result1['secure_url']
             elif not picture and not student.picture :
