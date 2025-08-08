@@ -1,0 +1,51 @@
+<div
+  class="modal fade"
+  id="deleteCollege"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="deleteCollegeLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteCollegeLabel">
+          Delete College ?
+        </h1>
+      </div>
+      <div class="modal-body">
+        <div
+          class="d-flex justify-content-between flex-column align-items-center"
+        >
+          <p>Are you sure u want to delete the College</p>
+          <p>and courses associated with it?</p>
+        </div>
+        <div
+          class="alert alert-danger"
+          id="errorcoldeletemsg"
+          name="errorcoldeletemsg"
+          role="alert"
+          style="display: none"
+        ></div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-dark fs-5"
+          data-bs-dismiss="modal"
+          data-bs-target="#deleteCollege"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          id="deleteCollegeForm"
+          class="btn btn-danger fs-5"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

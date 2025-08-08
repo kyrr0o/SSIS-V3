@@ -1,0 +1,117 @@
+{% extends "master_layout.html" %} {% block content %}
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center">
+    {% if search %}
+    <button
+      id="gobackcollege"
+      name="gobackcollege"
+      type="button"
+      class="btn btn-outline-dark"
+    >
+      Go Back
+    </button>
+    {% endif %} {% if not hideAdd %}
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addCollege"
+    >
+      Add College
+    </button>
+    {% endif %}
+    <form
+      action="{{ url_for('college_bp.college_search') }}"
+      style="width: 50%"
+    >
+      <div class="form-floating">
+        <select
+          class="form-select"
+          style="width: 50%"
+          aria-label="Default select example"
+          id="filter_college"
+          name="filter_college"
+        >
+          <option selected value="0">All</option>
+          <option value="1">College Code</option>
+          <option value="2">College Name</option>
+        </select>
+        <label for="filter_college" class="text-secondary-emphasis fw-bold"
+          >Search By</label
+        >
+      </div>
+      <div class="form-floating">
+        <input
+          name="querycollege"
+          class="form-control"
+          id="searchBar"
+          placeholder="Search"
+        />
+        <label for="searchBar">Search</label>
+      </div>
+    </form>
+  </div>
+
+  {% include 'college_add.html'%} {% if colleges %}
+  <h2>College List</h2>
+  <table class="table table-light table-hover p-5">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">College Code</th>
+        <th scope="col">College Name</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    {% for college in colleges %}
+    <tbody>
+      <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <th scope="row">{{college.code}}</th>
+        <th scope="row">{{college.name}}</th>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-secondary edit-College"
+            data-bs-toggle="modal"
+            data-bs-target="#editCollege"
+            data-college-code="{{college.code}}"
+            data-college-name="{{college.name}}"
+          >
+            Edit College
+          </button>
+        </td>
+        <td>
+          <button
+            type=" button"
+            class="btn btn-outline-danger delete-College"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteCollege"
+            data-college-code="{{college.code}}"
+          >
+            Delete College
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    {% include 'college_delete.html' %} {% include 'college_edit.html'%} {%
+    endfor %}
+  </table>
+  {% elif collegeInput %}
+  <div class="d-flex justify-content-between flex-column align-items-center">
+    <div class="alert alert-danger" role="alert">
+      Theres no {{filter_message}} Like: {{collegeInput}}
+    </div>
+  </div>
+  {% else %}
+  <div class="d-flex justify-content-center">
+    <h1>Theres no College yet</h1>
+  </div>
+
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='college.js') }}"></script>
+{% endblock %}

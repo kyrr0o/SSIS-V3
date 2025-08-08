@@ -1,0 +1,75 @@
+<div
+  class="modal fade"
+  id="addCollege"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="addCollegeLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addCollegeLabel">Add College</h1>
+      </div>
+      <div class="modal-body">
+        <form id="addCollegeForm" autocomplete="off">
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="college_code"
+              name="college_code"
+              placeholder="College Code"
+              required
+              value="{{ request.form['code'] }}"
+              maxlength="20"
+            />
+            <label for="college_code" class="text-secondary-emphasis fw-bold"
+              >College Code</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="college_name"
+              name="college_name"
+              placeholder="College name"
+              autocomplete="off"
+              required
+              value="{{ request.form['name'] }}"
+            />
+            <label for="college_name" class="text-secondary-emphasis fw-bold"
+              >College Name</label
+            >
+          </div>
+        </form>
+        <div
+          class="alert alert-danger"
+          id="errorcollegeaddmsg"
+          name="errorcollegeaddmsg"
+          role="alert"
+          style="display: none"
+        ></div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark fs-5"
+          data-bs-target="#addCollege"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          form="addCollegeForm"
+          class="btn btn-outline-primary fs-5"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
