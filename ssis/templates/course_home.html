@@ -1,0 +1,118 @@
+{% extends "master_layout.html" %} {% block content %}
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center">
+    {% if search %}
+    <button
+      id="gobackcourse"
+      name="gobackcourse"
+      type="button"
+      class="btn btn-outline-dark"
+    >
+      Go Back
+    </button>
+    {% endif %} {% if not hideAdd %}
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#addCourse"
+    >
+      Add Course
+    </button>
+    {% endif %}
+    <form action="{{ url_for('course_bp.course_search') }}" style="width: 50%">
+      <div class="form-floating">
+        <select
+          class="form-select"
+          style="width: 50%"
+          aria-label="Default select example"
+          id="filter_course"
+          name="filter_course"
+        >
+          <option selected value="0">All</option>
+          <option value="1">Course Code</option>
+          <option value="2">Course Name</option>
+          <option value="3">Course College Code</option>
+        </select>
+        <label for="filter_course" class="text-secondary-emphasis fw-bold"
+          >Search By</label
+        >
+      </div>
+      <div class="form-floating">
+        <input
+          name="querycourse"
+          class="form-control"
+          id="searchBar"
+          placeholder="Search"
+        />
+        <label for="searchBar">Search</label>
+      </div>
+    </form>
+  </div>
+
+  {% include 'course_add.html'%} {% if courses %}
+  <h2>Course List</h2>
+  <table class="table table-light table-hover p-5">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Course Code</th>
+        <th scope="col">Course Name</th>
+        <th scope="col">College Code</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    {% for course in courses %}
+    <tbody>
+      <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <th scope="row">{{course.code}}</th>
+        <th scope="row">{{course.name}}</th>
+        <th scope="row">{{course.college_code}}</th>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-secondary edit-Course"
+            data-bs-toggle="modal"
+            data-bs-target="#editCourse"
+            data-course-code="{{course.code}}"
+            data-course-name="{{course.name}}"
+            data-course-college="{{course.college_code}}"
+          >
+            Edit Course
+          </button>
+        </td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-danger delete-Course"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteCourse"
+            data-course-code="{{course.code}}"
+          >
+            Delete Course
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    {% include 'course_delete.html' %} {% include 'course_edit.html' %} {%
+    endfor %}
+  </table>
+  {% elif courseInput %}
+  <div class="d-flex justify-content-between flex-column align-items-center">
+    <div class="alert alert-danger" role="alert">
+      Theres no {{filter_message}} Like: {{courseInput}}
+    </div>
+  </div>
+  {% else %}
+  <div class="d-flex justify-content-center">
+    <h1>Theres no Course yet</h1>
+  </div>
+
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='course.js') }}"></script>
+{% endblock %}

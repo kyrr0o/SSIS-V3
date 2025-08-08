@@ -1,0 +1,92 @@
+<div
+  class="modal fade"
+  id="addCourse"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="addCourseLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addCourseLabel">Add Course</h1>
+      </div>
+      <div class="modal-body">
+        <form id="addCourseForm" autocomplete="off">
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="code"
+              name="code"
+              placeholder="Course Code"
+              required
+              value="{{ request.form['code'] }}"
+              maxlength="20"
+            />
+            <label for="code" class="text-secondary-emphasis fw-bold"
+              >Course Code</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              placeholder="Course name"
+              autocomplete="off"
+              required
+              value="{{ request.form['name'] }}"
+            />
+            <label for="name" class="text-secondary-emphasis fw-bold"
+              >Course Name</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <select
+              class="form-select"
+              id="college_code"
+              name="college_code"
+              aria-label="Floating label select example"
+              required
+            >
+              <option value="" selected disabled>Select</option>
+              {% for college in colleges%}
+              <option value="{{college.code}}">{{college.code}}</option>
+              {% endfor %}
+            </select>
+            <label for="college_code" class="text-secondary-emphasis fw-bold"
+              >What College is this course</label
+            >
+          </div>
+        </form>
+        <div
+          class="alert alert-danger"
+          id="erroraddmsg"
+          name="erroraddmsg"
+          role="alert"
+          style="display: none"
+        ></div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark fs-5"
+          data-bs-target="#addCourse"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          form="addCourseForm"
+          class="btn btn-outline-primary fs-5"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

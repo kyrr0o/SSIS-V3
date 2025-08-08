@@ -1,0 +1,98 @@
+<div
+  class="modal fade"
+  id="editCourse"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="editCourseLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editCourseLabel">Edit Course</h1>
+      </div>
+      <div class="modal-body">
+        <form id="editCourseForm" autocomplete="off">
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="edit_course_code"
+              name="edit_course_code"
+              placeholder="Course Code"
+              required
+              value=""
+              maxlength="20"
+            />
+            <label
+              for="edit_course_code"
+              class="text-secondary-emphasis fw-bold"
+              >Course Code</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="edit_course_name"
+              name="edit_course_name"
+              placeholder="Course name"
+              autocomplete="off"
+              required
+              value=""
+            />
+            <label
+              for="edit_course_name"
+              class="text-secondary-emphasis fw-bold"
+              >Course Name</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <select
+              class="form-select"
+              id="edit_course_college"
+              name="edit_course_college"
+              aria-label="Floating label select example"
+              required
+            >
+              <option value="" selected disabled>Select</option>
+              {% for college in colleges%}
+              <option value="{{college.code}}">{{college.code}}</option>
+              {% endfor %}
+            </select>
+            <label
+              for="edit_course_college"
+              class="text-secondary-emphasis fw-bold"
+              >What College is this course</label
+            >
+          </div>
+        </form>
+        <div
+          class="alert alert-danger"
+          id="erroreditmsg"
+          name="erroreditmsg"
+          role="alert"
+          style="display: none"
+        ></div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark fs-5"
+          data-bs-target="#editCourse"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="editCourseForm"
+          class="btn btn-outline-primary fs-5"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

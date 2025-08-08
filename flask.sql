@@ -1,0 +1,26 @@
+DROP DATABASE IF EXISTS `ssis`;
+CREATE DATABASE IF NOT EXISTS `ssis`;
+USE `ssis`;
+
+CREATE TABLE IF NOT EXISTS college (
+    code VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS course (
+    code VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    college_code VARCHAR(20) NOT NULL,
+    FOREIGN KEY (college_code) REFERENCES college(code) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS student (
+	id VARCHAR(20) PRIMARY KEY,
+    firstname VARCHAR(255) NOT NULL,
+    lastname VARCHAR(255) NOT NULL,
+    course_code VARCHAR(20) NOT NULL,
+    year VARCHAR(255) NOT NULL,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,
+    picture VARCHAR(255),
+    FOREIGN KEY (course_code) REFERENCES course(code) ON DELETE CASCADE ON UPDATE CASCADE
+);
