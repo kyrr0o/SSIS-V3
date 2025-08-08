@@ -1,7 +1,8 @@
-{% extends "master_layout.html" %} {% block content %}
+{% extends "master_layout.html" %} 
+{% block content %}
 
 <div class="container">
-  <div class="d-flex justify-content-between align-items-center">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     {% if search %}
     <button
       id="gobackcollege"
@@ -11,25 +12,16 @@
     >
       Go Back
     </button>
-    {% endif %} {% if not hideAdd %}
-    <button
-      type="button"
-      class="btn btn-outline-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#addCollege"
-    >
-      Add College
-    </button>
     {% endif %}
+
     <form
+      class="d-flex gap-2 flex-wrap align-items-center"
       action="{{ url_for('college_bp.college_search') }}"
-      style="width: 50%"
     >
-      <div class="form-floating">
+      <div class="form-floating" style="min-width: 180px;">
         <select
           class="form-select"
-          style="width: 50%"
-          aria-label="Default select example"
+          aria-label="Search filter"
           id="filter_college"
           name="filter_college"
         >
@@ -37,11 +29,10 @@
           <option value="1">College Code</option>
           <option value="2">College Name</option>
         </select>
-        <label for="filter_college" class="text-secondary-emphasis fw-bold"
-          >Search By</label
-        >
+        <label for="filter_college" class="text-secondary-emphasis fw-bold">Search By</label>
       </div>
-      <div class="form-floating">
+
+      <div class="form-floating" style="width: 400px;">
         <input
           name="querycollege"
           class="form-control"
@@ -50,10 +41,26 @@
         />
         <label for="searchBar">Search</label>
       </div>
+
+      <button type="submit" class="btn btn-outline-secondary h-100">Search</button>
     </form>
+
+    {% if not hideAdd %}
+    <button
+      type="button"
+      class="btn btn-primary"
+      style="background-color: #6f42c1; border-color: #6f42c1;"
+      data-bs-toggle="modal"
+      data-bs-target="#addCollege"
+    >
+      Add College
+    </button>
+    {% endif %}
   </div>
 
-  {% include 'college_add.html'%} {% if colleges %}
+  {% include 'college_add.html'%} 
+
+  {% if colleges %}
   <h2>College List</h2>
   <table class="table table-light table-hover p-5">
     <thead>
@@ -65,51 +72,53 @@
         <th scope="col"></th>
       </tr>
     </thead>
-    {% for college in colleges %}
     <tbody>
+      {% for college in colleges %}
       <tr>
         <th scope="row">{{ loop.index }}</th>
-        <th scope="row">{{college.code}}</th>
-        <th scope="row">{{college.name}}</th>
+        <td>{{ college.code }}</td>
+        <td>{{ college.name }}</td>
         <td>
           <button
             type="button"
             class="btn btn-outline-secondary edit-College"
             data-bs-toggle="modal"
             data-bs-target="#editCollege"
-            data-college-code="{{college.code}}"
-            data-college-name="{{college.name}}"
+            data-college-code="{{ college.code }}"
+            data-college-name="{{ college.name }}"
           >
             Edit College
           </button>
         </td>
         <td>
           <button
-            type=" button"
+            type="button"
             class="btn btn-outline-danger delete-College"
             data-bs-toggle="modal"
             data-bs-target="#deleteCollege"
-            data-college-code="{{college.code}}"
+            data-college-code="{{ college.code }}"
           >
             Delete College
           </button>
         </td>
       </tr>
+      {% include 'college_delete.html' %}
+      {% include 'college_edit.html' %}
+      {% endfor %}
     </tbody>
-    {% include 'college_delete.html' %} {% include 'college_edit.html'%} {%
-    endfor %}
   </table>
+
   {% elif collegeInput %}
   <div class="d-flex justify-content-between flex-column align-items-center">
     <div class="alert alert-danger" role="alert">
-      Theres no {{filter_message}} Like: {{collegeInput}}
+      There's no {{ filter_message }} Like: {{ collegeInput }}
     </div>
   </div>
+
   {% else %}
   <div class="d-flex justify-content-center">
-    <h1>Theres no College yet</h1>
+    <h1>There's no College yet</h1>
   </div>
-
   {% endif %}
 </div>
 

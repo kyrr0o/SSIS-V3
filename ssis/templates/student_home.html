@@ -1,35 +1,33 @@
-{% extends "master_layout.html" %} {% block content %}
+{% extends "master_layout.html" %} 
+{% block content %}
 
 <div class="container">
-  <div class="d-flex justify-content-between align-items-center">
-    {% if search %}
-    <button
-      id="gobackstudent"
-      name="gobackstudent"
-      type="button"
-      class="btn btn-outline-dark"
-    >
-      Go Back
-    </button>
-    {% endif %} {% if not hideAdd %}
-    <button
-      type="button"
-      class="btn btn-outline-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#addStudent"
-    >
-      Add Student
-    </button>
-    {% endif %}
-    <form
+
+  <!-- Top Controls Row -->
+  <div class="d-flex justify-content-between align-items-end flex-wrap my-4 gap-3">
+
+    <!-- Left: Go Back Button (if search active) -->
+    <div class="d-flex align-items-end gap-2 flex-wrap">
+      {% if search %}
+      <button
+        id="gobackstudent"
+        name="gobackstudent"
+        type="button"
+        class="btn btn-outline-dark"
+      >
+        Go Back
+      </button>
+      {% endif %}
+
+      <!-- Search Form -->
+      <form
+      class="d-flex gap-2 flex-wrap align-items-center"
       action="{{ url_for('student_bp.student_search') }}"
-      style="width: 50%"
     >
-      <div class="form-floating">
+      <div class="form-floating" style="min-width: 180px;">
         <select
           class="form-select"
-          style="width: 50%"
-          aria-label="Default select example"
+          aria-label="Search filter"
           id="filter_student"
           name="filter_student"
         >
@@ -38,28 +36,44 @@
           <option value="2">FirstName</option>
           <option value="3">LastName</option>
           <option value="4">Student Course</option>
+          <option value="7">Student College</option>
           <option value="5">Year</option>
           <option value="6">Gender</option>
         </select>
-        <label for="filter_student" class="text-secondary-emphasis fw-bold"
-          >Search By</label
-        >
+        <label for="filter_student" class="text-secondary-emphasis fw-bold">Search By</label>
       </div>
-      <div class="form-floating">
-        <div class="form-floating">
-          <input
-            name="querystudent"
-            class="form-control"
-            id="searchBar"
-            placeholder="Search"
-          />
-          <label for="searchBar">Search</label>
-        </div>
+
+      <div class="form-floating" style="width: 400px;">
+        <input
+          name="querystudent"
+          class="form-control"
+          id="searchBar"
+          placeholder="Search"
+        />
+        <label for="searchBar">Search</label>
       </div>
+
+      <button type="submit" class="btn btn-outline-secondary h-100">Search</button>
     </form>
+    </div>
+
+    <!-- Right: Add Student Button -->
+    {% if not hideAdd %}
+    <button
+      type="button"
+      class="btn"
+      style="background-color: #6f42c1; color: white;"
+      data-bs-toggle="modal"
+      data-bs-target="#addStudent"
+    >
+      Add Student
+    </button>
+    {% endif %}
   </div>
 
-  {% include 'student_add.html'%} {% if students %}
+  {% include 'student_add.html'%}
+
+  {% if students %}
   <h2>Student List</h2>
   <table class="table table-light table-hover p-5">
     <thead>
@@ -79,7 +93,8 @@
     <tbody>
       <tr>
         <th scope="row">
-          <img src="{{ student.picture if student.picture is not none else url_for('static', filename='picture.png') }}" class="img rounded-pill" id="photo-preview" style="width: 50px; height: 50px; object-fit: cover; object-position: center;"> <p>{{student.id}}</p>
+          <img src="{{ student.picture if student.picture is not none else url_for('static', filename='picture.png') }}" class="img rounded-pill" id="photo-preview" style="width: 50px; height: 50px; object-fit: cover; object-position: center;"> 
+          <p>{{student.id}}</p>
         </th>
         <th scope="row">{{student.firstname}}</th>
         <th scope="row">{{student.lastname}}</th>
@@ -117,42 +132,70 @@
         </td>
       </tr>
     </tbody>
-    {% include 'student_delete.html'%} {% include 'student_edit.html'%} {%
-    endfor %}
+    {% include 'student_delete.html'%} 
+    {% include 'student_edit.html'%} 
+    {% endfor %}
   </table>
+
+  <!-- Pagination Controls -->
+  {% if not search and total_pages > 1 %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page > 1 %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('student_bp.student', page=page-1) }}">Previous</a>
+      </li>
+      {% endif %}
+
+      {% for p in range(1, total_pages + 1) %}
+      <li class="page-item {% if p == page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('student_bp.student', page=p) }}">{{ p }}</a>
+      </li>
+      {% endfor %}
+
+      {% if page < total_pages %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('student_bp.student', page=page+1) }}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
   {% elif studentInput %}
   <div class="d-flex justify-content-between flex-column align-items-center">
     <div class="alert alert-danger" role="alert">
       Theres no {{filter_message}} Like: {{studentInput}}
     </div>
   </div>
+
   {% else %}
   <div class="d-flex justify-content-center">
     <h1>Theres no Students yet</h1>
   </div>
-
   {% endif %}
 </div>
 
+<!-- Styles -->
 <style>
-
   .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  z-index: 99999;
-  align-items: center;
-  justify-content: center;
-}
-
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 
+<!-- Scripts -->
 <script>
   const urlimg = "{{ url_for('static', filename='picture.png') }}";
 </script>
 <script src="{{ url_for('static', filename='student.js') }}"></script>
+
 {% endblock %}

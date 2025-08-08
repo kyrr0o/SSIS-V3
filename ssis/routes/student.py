@@ -38,10 +38,25 @@ def check_file_size(picture):
 def student():
     colleges = College.get_all()
     courses = Course.get_all()
-    students = Student.get_all()
-    return render_template('student_home.html', colleges=colleges , courses=courses,students=students)
 
-print("🔁 Calling student.add() with:", student.__dict__)
+    # 📄 Pagination logic
+    page = request.args.get('page', default=1, type=int)
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    # Get paginated student list and total count
+    students = Student.get_paginated(limit=per_page, offset=offset)
+    total_count = Student.get_total_count()
+    total_pages = (total_count + per_page - 1) // per_page  # ceiling division
+
+    return render_template(
+        'student_home.html',
+        colleges=colleges,
+        courses=courses,
+        students=students,
+        page=page,
+        total_pages=total_pages
+    )
 
 @student_bp.route("/student/add", methods=['POST'])
 def student_add():
@@ -207,6 +222,8 @@ def student_search():
                 filter_message= "Student Year"
             elif filter == "6":
                 filter_message = "Student Gender"
+            elif filter == "7":
+                filter_message = "Student College"
             return render_template('student_home.html', studentInput = input, search = True, hideAdd = True , filter_message=filter_message)
         else:
             return render_template('student_home.html', students=students, hideAdd = True, search = True, studentInput=input)
