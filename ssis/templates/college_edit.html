@@ -1,0 +1,79 @@
+<div
+  class="modal fade"
+  id="editCollege"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="editCollegeLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editCollegeLabel">Edit College</h1>
+      </div>
+      <div class="modal-body">
+        <form id="editCollegeForm" autocomplete="off">
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="edit_college_code"
+              name="edit_college_code"
+              placeholder="College Code"
+              required
+              value="{{ request.form['code'] }}"
+              maxlength="20"
+            />
+            <label
+              for="edit_college_code"
+              class="text-secondary-emphasis fw-bold"
+              >College Code</label
+            >
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="edit_college_name"
+              name="edit_college_name"
+              placeholder="College name"
+              autocomplete="off"
+              required
+              value="{{ request.form['name'] }}"
+            />
+            <label
+              for="edit_college_name"
+              class="text-secondary-emphasis fw-bold"
+              >College Name</label
+            >
+          </div>
+        </form>
+        <div
+          class="alert alert-danger"
+          id="errorcollegeeditmsg"
+          name="errorcollegeeditmsg"
+          role="alert"
+          style="display: none"
+        ></div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark fs-5"
+          data-bs-target="#editCollege"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          form="editCollegeForm"
+          class="btn btn-outline-primary fs-5"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
