@@ -161,24 +161,32 @@ document.getElementById("addStudentForm").addEventListener("submit", function (e
   let formData = new FormData(form);
 
   fetch("/student/add", {
-  method: "POST",
-  body: formData,
-})
-.then((response) => response.json())
-.then((data) => {
-  console.log("✅ Server Response:", data);
+    method: "POST",
+    body: formData,
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log("✅ Server Response:", data);
 
-  if (data.message === "Student added successfully") {
-    alert("🎉 Student added!");
-    document.getElementById("studentForm").reset();
-    document.getElementById("previewImage").src = "/static/picture.png"; // or any default
-    closeModal(); // if you're using a modal
-  } else if (data.error) {
-    alert("❌ Error: " + data.error);
-  }
-})
-.catch((error) => {
-  console.error("❌ Error submitting form:", error);
-});
+    if (data.message === "Student added successfully") {
+      alert("🎉 Student added!");
+
+      // Reset form and image preview
+      form.reset();
+      document.getElementById("photo-preview").src = "/static/picture.png";
+
+      // Close modal (Bootstrap 5)
+      const modal = bootstrap.Modal.getInstance(document.getElementById("addStudent"));
+      modal.hide();
+      
+      // Optional: reload table or page
+      window.location.href = data.redirect;
+    } else if (data.error) {
+      alert("❌ Error: " + data.error);
+    }
+  })
+  .catch((error) => {
+    console.error("❌ Error submitting form:", error);
+  });
 });
 </script>
