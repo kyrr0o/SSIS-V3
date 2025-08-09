@@ -120,8 +120,14 @@ def student_add():
 @student_bp.route("/student/delete", methods=['POST'])
 def student_delete():
     try:
-        id = request.form.get('csasdsda')
+        id = request.form.get('student_id')  # FIXED: use correct field name
+        if not id:
+            return jsonify({'error': 'Missing student ID'})
+
         student = Student.get_one(id)
+        if not student:
+            return jsonify({'error': 'Student not found'})
+
         if student.picture:
             public_id = get_public_id_from_url(student.picture)
             if public_id:
@@ -130,10 +136,7 @@ def student_delete():
         student.delete()
         return redirect(url_for("student_bp.student"))
     except Exception as e:
-        error = f"Error: {e}"
-        return jsonify({
-            'error' : error
-        })
+        return jsonify({'error': f"Error: {e}"})
 
 
 @student_bp.route("/student/edit", methods=['POST'])

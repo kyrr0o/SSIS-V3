@@ -1,50 +1,36 @@
-<div
-  class="modal fade"
-  id="deleteStudent"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  tabindex="-1"
-  aria-labelledby="deleteStudentLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="deleteStudent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteStudentLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="deleteStudentLabel">
-          Delete Student ?
-        </h1>
-      </div>
-      <div class="modal-body">
-        <div
-          class="d-flex justify-content-between flex-column align-items-center"
-        >
-          <p>Are you sure u want to delete the student?</p>
+    <form method="POST" action="{{ url_for('student_bp.student_delete') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteStudentLabel">Delete Student ?</h1>
         </div>
-        <div
-          class="alert alert-danger"
-          id="errordeletstdemsg"
-          name="errordeletstdemsg"
-          role="alert"
-          style="display: none"
-        ></div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the student?</p>
+          <div class="alert alert-danger" id="errordeletstdemsg" style="display: none"></div>
+          
+          <!-- Hidden inputs for backend -->
+          <input type="hidden" name="student_id" id="delete_student_id">
+          <input type="hidden" name="public_id" id="delete_student_public_id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-dark fs-5" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger fs-5">Delete</button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-dark fs-5"
-          data-bs-dismiss="modal"
-          data-bs-target="#deleteStudent"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          id="deleteStudentForm"
-          class="btn btn-danger fs-5"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
+    </form>
   </div>
 </div>
+
+<script>
+  // When delete button is clicked, fill hidden inputs
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-Student');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        document.getElementById('delete_student_id').value = this.getAttribute('data-student-id');
+        document.getElementById('delete_student_public_id').value = this.getAttribute('data-student-public-id');
+      });
+    });
+  });
+</script>

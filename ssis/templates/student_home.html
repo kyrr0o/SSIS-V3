@@ -21,40 +21,40 @@
 
       <!-- Search Form -->
       <form
-      class="d-flex gap-2 flex-wrap align-items-center"
-      action="{{ url_for('student_bp.student_search') }}"
-    >
-      <div class="form-floating" style="min-width: 180px;">
-        <select
-          class="form-select"
-          aria-label="Search filter"
-          id="filter_student"
-          name="filter_student"
-        >
-          <option selected value="0">All</option>
-          <option value="1">Student ID</option>
-          <option value="2">FirstName</option>
-          <option value="3">LastName</option>
-          <option value="4">Student Course</option>
-          <option value="7">Student College</option>
-          <option value="5">Year</option>
-          <option value="6">Gender</option>
-        </select>
-        <label for="filter_student" class="text-secondary-emphasis fw-bold">Search By</label>
-      </div>
+        class="d-flex gap-2 flex-wrap align-items-center"
+        action="{{ url_for('student_bp.student_search') }}"
+      >
+        <div class="form-floating" style="min-width: 180px;">
+          <select
+            class="form-select"
+            aria-label="Search filter"
+            id="filter_student"
+            name="filter_student"
+          >
+            <option selected value="0">All</option>
+            <option value="1">Student ID</option>
+            <option value="2">FirstName</option>
+            <option value="3">LastName</option>
+            <option value="4">Student Course</option>
+            <option value="7">Student College</option>
+            <option value="5">Year</option>
+            <option value="6">Gender</option>
+          </select>
+          <label for="filter_student" class="text-secondary-emphasis fw-bold">Search By</label>
+        </div>
 
-      <div class="form-floating" style="width: 400px;">
-        <input
-          name="querystudent"
-          class="form-control"
-          id="searchBar"
-          placeholder="Search"
-        />
-        <label for="searchBar">Search</label>
-      </div>
+        <div class="form-floating" style="width: 400px;">
+          <input
+            name="querystudent"
+            class="form-control"
+            id="searchBar"
+            placeholder="Search"
+          />
+          <label for="searchBar">Search</label>
+        </div>
 
-      <button type="submit" class="btn btn-outline-secondary h-100">Search</button>
-    </form>
+        <button type="submit" class="btn btn-outline-secondary h-100">Search</button>
+      </form>
     </div>
 
     <!-- Right: Add Student Button -->
@@ -71,7 +71,8 @@
     {% endif %}
   </div>
 
-  {% include 'student_add.html'%}
+  <!-- Add Student Modal -->
+  {% include 'student_add.html' %}
 
   {% if students %}
   <h2>Student List</h2>
@@ -93,47 +94,49 @@
     <tbody>
       <tr>
         <th scope="row">
-          <img src="{{ student.picture if student.picture is not none else url_for('static', filename='picture.png') }}" class="img rounded-pill" id="photo-preview" style="width: 50px; height: 50px; object-fit: cover; object-position: center;"> 
-          <p>{{student.id}}</p>
+          <img 
+            src="{{ student.picture if student.picture is not none else url_for('static', filename='picture.png') }}" 
+            class="img rounded-pill" 
+            style="width: 50px; height: 50px; object-fit: cover; object-position: center;"
+          > 
+          <p>{{ student.id }}</p>
         </th>
-        <th scope="row">{{student.firstname}}</th>
-        <th scope="row">{{student.lastname}}</th>
-        <th scope="row">{{student.course_code}}</th>
-        <th scope="row">{{student.college}}</th>
-        <th scope="row">{{student.year}}</th>
-        <th scope="row">{{student.gender}}</th>
+        <th scope="row">{{ student.firstname }}</th>
+        <th scope="row">{{ student.lastname }}</th>
+        <th scope="row">{{ student.course_code }}</th>
+        <th scope="row">{{ student.college }}</th>
+        <th scope="row">{{ student.year }}</th>
+        <th scope="row">{{ student.gender }}</th>
         <td>
           <button
             type="button"
             class="btn btn-outline-secondary edit-Student"
             data-bs-toggle="modal"
             data-bs-target="#editStudent"
-            data-student-id="{{student.id}}"
-            data-student-firstname="{{student.firstname}}"
-            data-student-lastname="{{student.lastname}}"
-            data-student-course="{{student.course_code}}"
-            data-student-year="{{student.year}}"
-            data-student-gender="{{student.gender}}"
-            data-student-picture="{{student.picture}}"
+            data-student-id="{{ student.id }}"
+            data-student-firstname="{{ student.firstname }}"
+            data-student-lastname="{{ student.lastname }}"
+            data-student-course="{{ student.course_code }}"
+            data-student-year="{{ student.year }}"
+            data-student-gender="{{ student.gender }}"
+            data-student-picture="{{ student.picture }}"
           >
             Edit Student
           </button>
         </td>
         <td>
-          <button
-            type="button"
-            class="btn btn-outline-danger delete-Student"
-            data-bs-toggle="modal"
-            data-bs-target="#deleteStudent"
-            data-student-id="{{student.id}}"
-          >
-            Delete Student
-          </button>
+          <button class="btn btn-danger" 
+          data-bs-toggle="modal" 
+          data-bs-target="#deleteStudent"
+          data-student-id="{{ student.id }}">
+          Delete
+        </button>
+
         </td>
       </tr>
     </tbody>
-    {% include 'student_delete.html'%} 
-    {% include 'student_edit.html'%} 
+    {% include 'student_delete.html' %} 
+    {% include 'student_edit.html' %} 
     {% endfor %}
   </table>
 
@@ -165,7 +168,7 @@
   {% elif studentInput %}
   <div class="d-flex justify-content-between flex-column align-items-center">
     <div class="alert alert-danger" role="alert">
-      Theres no {{filter_message}} Like: {{studentInput}}
+      Theres no {{ filter_message }} Like: {{ studentInput }}
     </div>
   </div>
 

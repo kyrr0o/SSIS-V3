@@ -41,27 +41,57 @@ $(document).ready(function () {
     });
     event.preventDefault();
   });
+let selectedStudentId = null;
+let selectedPublicId = null;
 
-  $(".delete-Student").click(function () {
-    var studentId = $(this).data("student-id");
+$(".delete-Student").click(function () {
+  selectedStudentId = $(this).data("student-id");
+  selectedPublicId = $(this).data("student-public-id");
+});
 
-    $("#deleteStudentForm").click(function () {
-      $('body').append('<div class="loading-overlay"> <div class="spinner-border me-3" style="width: 3rem; height: 3rem;"> <span class="visually-hidden">Loading...</span></div><h2> Deleting Student \n This should only take a minute... </h2></div>');
-      $.ajax({
-        type: "POST",
-        url: "/student/delete",
-        data: { csasdsda: studentId },
-      }).done(function (data) {
-        $('.loading-overlay').remove();
-        if (data.error) {
-          $("#errordeletstdemsg").text(data.error).show();
-        } else {
-          alert("Sucessfully deleted student: " + studentId);
-          window.location.href = "/student";
-        }
-      });
-    });
+$("#deleteStudentForm").off("click").on("click", function () {
+  if (!selectedStudentId || !selectedPublicId) {
+    $("#errordeletstdemsg").text("Missing student ID or public ID").show();
+    return;
+  }
+
+  // Show loading UI
+  $('body').append(`
+    <div class="loading-overlay">
+      <div class="spinner-border me-3" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <h2>Deleting Student<br>This should only take a minute...</h2>
+    </div>
+  `);
+
+  // Send delete request
+  $.ajax({
+    type: "POST",
+    url: "/student/delete",
+    contentType: "application/json",
+    data: JSON.stringify({
+      student_id: selectedStudentId,
+      public_id: selectedPublicId,
+    }),
+    success: function (data) {
+      $('.loading-overlay').remove();
+
+      if (data.error) {
+        $("#errordeletstdemsg").text(data.error).show();
+      } else {
+        alert("Successfully deleted student: " + selectedStudentId);
+        window.location.href = "/student";
+      }
+    },
+    error: function (xhr) {
+      $('.loading-overlay').remove();
+      $("#errordeletstdemsg").text("Something went wrong.").show();
+      console.error(xhr.responseText);
+    },
   });
+});
+
 
   $(".edit-Student").on("click", function () {
     var id = $(this).data("student-id");
@@ -114,4 +144,12 @@ $(document).ready(function () {
   $("#gobackstudent").on("click", function () {
     window.location.href = "/student";
   });
+
+  var deleteModal = document.getElementById('deleteStudent');
+deleteModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget; // The button that triggered the modal
+  var studentId = button.getAttribute('data-student-id');
+  document.getElementById('delete_student_id').value = studentId;
+});
+
 });

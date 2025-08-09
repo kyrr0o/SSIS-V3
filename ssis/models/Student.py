@@ -86,7 +86,6 @@ class Student():
         return students
 
 
-
     @classmethod
     def get_all(cls,table_name = 'student'):
         cursor = mysql.connection.cursor()
@@ -114,8 +113,7 @@ class Student():
         cursor.close
 
         if student_data:
-            return Student(id = student_data[0] , firstname = student_data[1], lastname=student_data[2], course_code=student_data[3], year=student_data[4], gender=student_data[5], picture=student_data[6])
-        else:
+            return Student(id = student_data[0] , firstname = student_data[1], lastname=student_data[2], course_code=student_data[3], year=student_data[4], gender=student_data[5])
             return None
 
     @classmethod
