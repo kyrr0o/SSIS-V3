@@ -9,6 +9,7 @@ from ..models.Student import Student
 from cloudinary import uploader
 from cloudinary.uploader import upload
 from config import Config
+from flask import flash
 import re
 
 student_bp = Blueprint(
@@ -26,10 +27,13 @@ def get_public_id_from_url(url):
     return match.group(1) if match else None
 
 def check_file_size(picture):
-    maxsize = 1 * 1024 * 1024  # 1MB
-    picture.seek(0, 2)  # Move to end of file
-    size = picture.tell()  # Get size in bytes
-    picture.seek(0)  # Reset to beginning
+
+    # image size
+    maxsize = 1 * 1024 * 1024  
+
+    picture.seek(0, 2)  
+    size = picture.tell() 
+    picture.seek(0) 
     print("📸 Uploaded picture size:", size, "bytes")
     return size <= maxsize
 
@@ -39,7 +43,7 @@ def student():
     colleges = College.get_all()
     courses = Course.get_all()
 
-    # 📄 Pagination logic
+    # logic for pagination
     page = request.args.get('page', default=1, type=int)
     per_page = 50
     offset = (page - 1) * per_page
@@ -67,7 +71,7 @@ def student_add():
     print("Course Code:", request.form.get("student_course_code"))
     print("Year:", request.form.get("student_year"))
     print("Gender:", request.form.get("student_gender"))
-    print("✅ Student added successfully")
+    print("Student added successfully")
 
     id = request.form.get('student_id', '').strip()
     firstname = request.form.get('student_first_name')
@@ -76,7 +80,7 @@ def student_add():
     year = request.form.get('student_year')
     gender = request.form.get('student_gender')
     if 'formFile' not in request.files:
-        print("🚫 No file part in request.files")
+        print("No file part in request.files")
         return jsonify({'error': 'No file part in form'})
 
     picture = request.files['formFile']
@@ -111,7 +115,6 @@ def student_add():
         )
         student.add()
 
-        # ✅ THIS IS THE FIX: send redirect URL in JSON
         return jsonify({ 'redirect': url_for("student_bp.student") })
 
     except Exception as e:
@@ -120,11 +123,11 @@ def student_add():
 @student_bp.route("/student/delete", methods=['POST'])
 def student_delete():
     try:
-        id = request.form.get('student_id')  # FIXED: use correct field name
-        if not id:
+        student_id = request.form.get('student_id')  
+        if not student_id:
             return jsonify({'error': 'Missing student ID'})
 
-        student = Student.get_one(id)
+        student = Student.get_one(student_id)
         if not student:
             return jsonify({'error': 'Student not found'})
 
@@ -134,10 +137,10 @@ def student_delete():
                 uploader.destroy(public_id)
 
         student.delete()
+
         return redirect(url_for("student_bp.student"))
     except Exception as e:
         return jsonify({'error': f"Error: {e}"})
-
 
 @student_bp.route("/student/edit", methods=['POST'])
 def student_edit():
@@ -148,67 +151,58 @@ def student_edit():
     course_code = request.form.get('edit_student_course_code')
     year = request.form.get('edit_student_year')
     gender = request.form.get('edit_student_gender')
-    picture = request.files['editFormFile']
 
-    error = f"{pastid} {id} {firstname} {lastname} {course_code} {year} {gender} {picture.filename}"
+    picture = request.files.get('editFormFile')  # safe get
 
     student = Student.get_one(pastid)
+    if not student:
+        return jsonify({'error': 'Student not found'})
+
+    # Check ID change
     if id != pastid:
-        exist_student = Student.get_one(id)
-        if exist_student:
-            error = f"Student ID: {id} is already taken"
-            return jsonify({'error' : error})
-        else:
-            try:
-                student = Student(id=id,firstname=firstname,lastname=lastname,course_code=course_code,year=year,gender=gender)
-                if not check_file_size(picture):
-                    return jsonify({'error': 'Max Size Limit is: 1mb' })
-                if picture and allowed_file(picture.filename):
-                    if student.picture:
-                        public_id = get_public_id_from_url(student.picture)
-                        if public_id:
-                            uploader.destroy(public_id)
+        if Student.get_one(id):
+            return jsonify({'error': f"Student ID: {id} is already taken"})
+        student.id = id
 
-                    result1 = upload(picture, folder= Config.CLOUDINARY_FOLDER)
-                    student.picture = result1['secure_url']
-                elif not picture and not student.picture :
-                    return jsonify({ 'error': 'Image is required and pictures only'})
-                student.update(pastid)
-                return redirect(url_for("student_bp.student"))
-            except Exception as e:
-                return jsonify({'error': e})
-    else:
-        try:
-            student.firstname = firstname
-            student.lastname = lastname
-            student.course_code = course_code
-            student.year = year
-            student.gender = gender
-            if not check_file_size(picture):
-                return jsonify({'error': 'Max Size Limit is: 1mb or 1024kb' })
-            if picture and allowed_file(picture.filename):
-                if student.picture:
-                    public_id = get_public_id_from_url(student.picture)
-                    if public_id:
-                        uploader.destroy(public_id)
+    student.firstname = firstname
+    student.lastname = lastname
+    student.course_code = course_code
+    student.year = year
+    student.gender = gender
 
-                result1 = upload(picture, folder= Config.CLOUDINARY_FOLDER)
-                student.picture = result1['secure_url']
-            elif not picture and not student.picture :
-                return jsonify({ 'error': 'Image is required and pictures only'})
-            student.update(id)
-            return redirect(url_for("student_bp.student"))
-        except Exception as e:
-            return jsonify({'error' : e})
-        
+    # Only replace picture if a new one is uploaded
+    if picture and picture.filename.strip() != "":
+        if not allowed_file(picture.filename):
+            return jsonify({'error': 'Image must be PNG, JPG, or JPEG'})
+        if not check_file_size(picture):
+            return jsonify({'error': 'Max file size is 1MB'})
+
+        # Delete old image from Cloudinary if exists
+        if student.picture:
+            public_id = get_public_id_from_url(student.picture)
+            if public_id:
+                uploader.destroy(public_id)
+
+        # Upload new image
+        result = upload(picture, folder=Config.CLOUDINARY_FOLDER)
+        student.picture = result['secure_url']
+
+    # If no new picture uploaded, keep the existing one
+    # (Nothing to do here — `student.picture` already has the old URL)
+
+    student.update(pastid)
+    return redirect(url_for("student_bp.student"))
 
 @student_bp.route("/student/search", methods=['GET','POST'])
 def student_search():
     input = request.args.get('querystudent')
     filter = request.args.get('filter_student')
 
+    colleges = College.get_all()
+    courses = Course.get_all()
+
     if input:
-        students = Student.search(input,filter)
+        students = Student.search(input, filter)
         if not students:
             filter_message = ""
             if filter == "0":
@@ -220,14 +214,32 @@ def student_search():
             elif filter == "3":
                 filter_message = "Student Last Name"
             elif filter == "4":
-                filter_message= "Student Course"
+                filter_message = "Student Course"
             elif filter == "5":
-                filter_message= "Student Year"
+                filter_message = "Student Year"
             elif filter == "6":
                 filter_message = "Student Gender"
             elif filter == "7":
                 filter_message = "Student College"
-            return render_template('student_home.html', studentInput = input, search = True, hideAdd = True , filter_message=filter_message)
+
+            return render_template(
+                'student_home.html',
+                studentInput=input,
+                search=True,
+                hideAdd=True,
+                filter_message=filter_message,
+                colleges=colleges,
+                courses=courses
+            )
         else:
-            return render_template('student_home.html', students=students, hideAdd = True, search = True, studentInput=input)
+            return render_template(
+                'student_home.html',
+                students=students,
+                hideAdd=True,
+                search=True,
+                studentInput=input,
+                colleges=colleges,
+                courses=courses
+            )
+
     return redirect(url_for("student_bp.student"))

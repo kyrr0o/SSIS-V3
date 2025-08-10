@@ -31,11 +31,37 @@ class Student():
         self.connection.commit()
         cursor.close()
     
-    def update(self,id):
+    def update(self, old_id):
         cursor = self.connection.cursor()
-        cursor.execute("UPDATE student SET id=%s, firstname=%s, lastname=%s, course_code=%s, year=%s, gender=%s , picture=%s WHERE id=%s" , (self.id, self.firstname,self.lastname, self.course_code, self.year, self.gender,self.picture,id))
-        self.connection.commit()
-        cursor.close()
+        try:
+            if not self.picture:
+                cursor.execute("SELECT picture FROM student WHERE id=%s", (old_id,))
+                row = cursor.fetchone()
+                if row:
+                    self.picture = row[0]
+
+            cursor.execute("""
+                UPDATE student
+                SET id=%s, firstname=%s, lastname=%s, course_code=%s, year=%s, gender=%s, picture=%s
+                WHERE id=%s
+            """, (
+                self.id,
+                self.firstname,
+                self.lastname,
+                self.course_code,
+                self.year,
+                self.gender,
+                self.picture,
+                old_id
+            ))
+            self.connection.commit()
+        except Exception as e:
+            print(f"Error updating student: {e}")
+            self.connection.rollback()
+        finally:
+            cursor.close()
+
+
 
     def delete(self):
         cursor = self.connection.cursor()
@@ -50,7 +76,13 @@ class Student():
         if filter == "0":
             cursor.execute("SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture FROM student INNER JOIN course ON student.course_code = course.code INNER JOIN college ON course.college_code = college.code WHERE student.id LIKE %s OR student.firstname LIKE %s OR student.lastname LIKE %s OR student.course_code LIKE %s OR student.year LIKE %s OR student.gender LIKE %s", (f"%{input}%", f"%{input}%", f"%{input}%", f"%{input}%", f"%{input}%", f"%{input}%"))
         elif filter == "1":
-            cursor.execute("SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture FROM student INNER JOIN course ON student.course_code = course.code INNER JOIN college ON course.college_code = college.code WHERE student.id LIKE %s", (f"%{input}%",))
+            cursor.execute("""
+                SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture
+                FROM student
+                INNER JOIN course ON student.course_code = course.code
+                INNER JOIN college ON course.college_code = college.code
+                WHERE student.id = %s
+            """, (input,))
         elif filter == "2":
             cursor.execute("SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture FROM student INNER JOIN course ON student.course_code = course.code INNER JOIN college ON course.college_code = college.code WHERE student.firstname LIKE %s", (f"%{input}%",))
         elif filter == "3":
@@ -63,12 +95,13 @@ class Student():
             cursor.execute("SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture FROM student INNER JOIN course ON student.course_code = course.code INNER JOIN college ON course.college_code = college.code WHERE student.gender = %s", (f"{input}",))
         elif filter == "7":
             cursor.execute("""
-                SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture
-                FROM student 
-                INNER JOIN course ON student.course_code = course.code 
-                INNER JOIN college ON course.college_code = college.code 
-                WHERE college.name LIKE %s OR college.code LIKE %s
-            """, (f"%{input}%", f"%{input}%"))
+                    SELECT student.id, student.firstname, student.lastname, student.course_code, student.year, student.gender, course.college_code, student.picture
+                    FROM student 
+                    INNER JOIN course ON student.course_code = course.code 
+                    INNER JOIN college ON course.college_code = college.code 
+                    WHERE college.name LIKE %s OR college.code LIKE %s
+                    ORDER BY student.id
+                """, (f"%{input}%", f"%{input}%"))
 
         for student_data in cursor.fetchall():
             student = Student(
@@ -106,15 +139,24 @@ class Student():
         return student_data is not None
     
     @classmethod
-    def get_one(clr, id):
+    def get_one(cls, id):
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT * FROM student WHERE id = %s", (id,))
         student_data = cursor.fetchone()
-        cursor.close
+        cursor.close()
 
         if student_data:
-            return Student(id = student_data[0] , firstname = student_data[1], lastname=student_data[2], course_code=student_data[3], year=student_data[4], gender=student_data[5])
-            return None
+            return Student(
+                id=student_data[0],
+                firstname=student_data[1],
+                lastname=student_data[2],
+                course_code=student_data[3],
+                year=student_data[4],
+                gender=student_data[5],
+                picture=student_data[6]  # include picture from DB
+            )
+        return None
+
 
     @classmethod
     def get_paginated(cls, limit=50, offset=0):
