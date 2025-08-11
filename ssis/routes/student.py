@@ -34,7 +34,7 @@ def check_file_size(picture):
     picture.seek(0, 2)  
     size = picture.tell() 
     picture.seek(0) 
-    print("📸 Uploaded picture size:", size, "bytes")
+    print("Uploaded picture size:", size, "bytes")
     return size <= maxsize
 
 @student_bp.route("/")
@@ -51,7 +51,7 @@ def student():
     # Get paginated student list and total count
     students = Student.get_paginated(limit=per_page, offset=offset)
     total_count = Student.get_total_count()
-    total_pages = (total_count + per_page - 1) // per_page  # ceiling division
+    total_pages = (total_count + per_page - 1) // per_page 
 
     return render_template(
         'student_home.html',
@@ -64,7 +64,7 @@ def student():
 
 @student_bp.route("/student/add", methods=['POST'])
 def student_add():
-    print("🧾 Form Data Received:")
+    print("Form Data Received:")
     print("Student ID:", request.form.get("student_id"))
     print("First Name:", request.form.get("student_first_name"))
     print("Last Name:", request.form.get("student_last_name"))
@@ -84,8 +84,8 @@ def student_add():
         return jsonify({'error': 'No file part in form'})
 
     picture = request.files['formFile']
-    print("📂 Picture object:", picture)
-    print("📂 Picture filename:", picture.filename)
+    print("Picture object:", picture)
+    print("Picture filename:", picture.filename)
 
     # Check if student ID is already taken
     exist_student = Student.check_existing_id(id)
@@ -152,7 +152,7 @@ def student_edit():
     year = request.form.get('edit_student_year')
     gender = request.form.get('edit_student_gender')
 
-    picture = request.files.get('editFormFile')  # safe get
+    picture = request.files.get('editFormFile') 
 
     student = Student.get_one(pastid)
     if not student:
@@ -186,9 +186,6 @@ def student_edit():
         # Upload new image
         result = upload(picture, folder=Config.CLOUDINARY_FOLDER)
         student.picture = result['secure_url']
-
-    # If no new picture uploaded, keep the existing one
-    # (Nothing to do here — `student.picture` already has the old URL)
 
     student.update(pastid)
     return redirect(url_for("student_bp.student"))
