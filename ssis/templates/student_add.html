@@ -35,14 +35,16 @@
               class="form-control"
               id="student_id"
               name="student_id"
-              placeholder="Course Code"
+              placeholder="Student ID"
               required
               value="{{ request.form['code'] }}"
-              maxlength="20"
+              maxlength="9"
+              pattern="\d{4}-\d{4}"
+              title="Student ID must be in the format: 1234-5678"
             />
-            <label for="student_id" class="text-secondary-emphasis fw-bold"
-              >Student Id</label
-            >
+            <label for="student_id" class="text-secondary-emphasis fw-bold">
+              Student Id
+            </label>
           </div>
           <div class="form-floating mb-3">
             <input

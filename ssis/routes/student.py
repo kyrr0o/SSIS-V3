@@ -45,7 +45,7 @@ def student():
 
     # logic for pagination
     page = request.args.get('page', default=1, type=int)
-    per_page = 50
+    per_page = 10
     offset = (page - 1) * per_page
 
     # Get paginated student list and total count
@@ -79,6 +79,10 @@ def student_add():
     course_code = request.form.get('student_course_code')
     year = request.form.get('student_year')
     gender = request.form.get('student_gender')
+
+    if not re.fullmatch(r"\d{4}-\d{4}", id):
+        return jsonify({'error': 'Invalid Student ID format. Use xxxx-xxxx with only numbers.'})
+    
     if 'formFile' not in request.files:
         print("No file part in request.files")
         return jsonify({'error': 'No file part in form'})
