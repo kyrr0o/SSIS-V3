@@ -129,11 +129,13 @@ def student_delete():
     try:
         student_id = request.form.get('student_id')  
         if not student_id:
-            return jsonify({'error': 'Missing student ID'})
+            flash('Missing student ID', 'danger')
+            return redirect(url_for("student_bp.student"))
 
         student = Student.get_one(student_id)
         if not student:
-            return jsonify({'error': 'Student not found'})
+            flash('Student not found', 'danger')
+            return redirect(url_for("student_bp.student"))
 
         if student.picture:
             public_id = get_public_id_from_url(student.picture)
@@ -141,10 +143,11 @@ def student_delete():
                 uploader.destroy(public_id)
 
         student.delete()
-
+        flash('Successfully deleted student', 'success')  # <--- flash message here
         return redirect(url_for("student_bp.student"))
     except Exception as e:
-        return jsonify({'error': f"Error: {e}"})
+        flash(f"Error deleting student: {e}", 'danger')
+        return redirect(url_for("student_bp.student"))
 
 @student_bp.route("/student/edit", methods=['POST'])
 def student_edit():
