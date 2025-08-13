@@ -83,46 +83,40 @@ def student_add():
     if not re.fullmatch(r"\d{4}-\d{4}", id):
         return jsonify({'error': 'Invalid Student ID format. Use xxxx-xxxx with only numbers.'})
     
-    if 'formFile' not in request.files:
-        print("No file part in request.files")
-        return jsonify({'error': 'No file part in form'})
-
-    picture = request.files['formFile']
-    print("Picture object:", picture)
-    print("Picture filename:", picture.filename)
-
     # Check if student ID is already taken
     exist_student = Student.check_existing_id(id)
     if exist_student:
         return jsonify({ 'error': f"Student ID: {id} is already taken" })
 
-    # Check picture validity
-    if not picture or not allowed_file(picture.filename):
-        return jsonify({ 'error': 'Image is required and must be PNG, JPG, or JPEG' })
+    # Handle optional image upload
+    picture = request.files.get('formFile')
+    image_url = None  # Default to None if no image
 
-    if not check_file_size(picture):
-        return jsonify({ 'error': 'Max file size is 1MB' })
+    if picture and picture.filename != '':
+        if not allowed_file(picture.filename):
+            return jsonify({'error': 'Image must be PNG, JPG, or JPEG'})
+        if not check_file_size(picture):
+            return jsonify({'error': 'Max file size is 1MB'})
+        try:
+            # Upload image to Cloudinary
+            result = upload(picture, folder=Config.CLOUDINARY_FOLDER)
+            image_url = result['secure_url']
+        except Exception as e:
+            return jsonify({'error': f"Image upload failed: {str(e)}"})
+    
+    # Create and save student
+    student = Student(
+        id=id,
+        firstname=firstname,
+        lastname=lastname,
+        course_code=course_code,
+        year=year,
+        gender=gender,
+        picture=image_url  # will be None if no image uploaded
+    )
+    student.add()
 
-    try:
-        # Upload image to Cloudinary
-        result = upload(picture, folder=Config.CLOUDINARY_FOLDER)
-
-        # Create and save student
-        student = Student(
-            id=id,
-            firstname=firstname,
-            lastname=lastname,
-            course_code=course_code,
-            year=year,
-            gender=gender,
-            picture=result['secure_url']
-        )
-        student.add()
-
-        return jsonify({ 'redirect': url_for("student_bp.student") })
-
-    except Exception as e:
-        return jsonify({ 'error': str(e) })
+    return jsonify({'redirect': url_for("student_bp.student")})
 
 @student_bp.route("/student/delete", methods=['POST'])
 def student_delete():
