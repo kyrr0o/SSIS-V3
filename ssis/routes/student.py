@@ -121,15 +121,23 @@ def student_add():
 @student_bp.route("/student/delete", methods=['POST'])
 def student_delete():
     try:
-        student_id = request.form.get('student_id')  
+        student_id = request.form.get('student_id')
         if not student_id:
-            flash('Missing student ID', 'danger')
-            return redirect(url_for("student_bp.student"))
+            return """
+                <script>
+                    alert('Missing student ID');
+                    window.location.href = '/student';
+                </script>
+            """
 
         student = Student.get_one(student_id)
         if not student:
-            flash('Student not found', 'danger')
-            return redirect(url_for("student_bp.student"))
+            return """
+                <script>
+                    alert('Student not found');
+                    window.location.href = '/student';
+                </script>
+            """
 
         if student.picture:
             public_id = get_public_id_from_url(student.picture)
@@ -137,11 +145,21 @@ def student_delete():
                 uploader.destroy(public_id)
 
         student.delete()
-        flash('Successfully deleted student', 'success')  # <--- flash message here
-        return redirect(url_for("student_bp.student"))
+        # Return a JavaScript alert and redirect instead of flash()
+        return """
+            <script>
+                alert('Successfully deleted student');
+                window.location.href = '/student';
+            </script>
+        """
     except Exception as e:
-        flash(f"Error deleting student: {e}", 'danger')
-        return redirect(url_for("student_bp.student"))
+        return f"""
+            <script>
+                alert('Error deleting student: {str(e)}');
+                window.location.href = '/student';
+            </script>
+        """
+
 
 @student_bp.route("/student/edit", methods=['POST'])
 def student_edit():
